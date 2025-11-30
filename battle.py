@@ -3,6 +3,7 @@
 
 import threading
 import time
+import base64
 import ast
 from typing import Dict, Any
 from pokemon import get_pokemon
@@ -260,9 +261,27 @@ def make_handler(battle_state: BattleState, pokemon_db, node, role="joiner", ver
 
         elif mtype == "CHAT_MESSAGE":
             sender = msg.get("sender_name", "Anon")
-            if msg.get("content_type") == "TEXT":
+            ctype = msg.get("content_type")
+
+            if ctype == "TEXT":
                 print(f"[CHAT] {sender}: {msg.get('message_text')}")
-            else:
-                print(f"[CHAT] {sender} sent a sticker.")
+
+            elif ctype == "STICKER":
+                b64_data = msg.get("sticker_data")
+                if b64_data:
+                    try:
+                        # Decode and save to file
+                        image_bytes = base64.b64decode(b64_data)
+                        timestamp = int(time.time())
+                        filename = f"received_sticker_{timestamp}.png"
+
+                        with open(filename, "wb") as f:
+                            f.write(image_bytes)
+
+                        print(f"[CHAT] {sender} sent a sticker! Saved as '{filename}'")
+                    except Exception as e:
+                        print(f"[CHAT] Error saving sticker: {e}")
+                else:
+                    print(f"[CHAT] {sender} sent a sticker, but data was empty.")
 
     return handler
