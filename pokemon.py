@@ -1,5 +1,5 @@
 # pokemon.py
-# loads pokemon_data.csv, provides lookup functions
+# Loads the specific CSV format provided (with against_X columns).
 
 import csv
 import os
@@ -7,17 +7,27 @@ from typing import Dict, Optional
 
 DEFAULT_CSV = "pokemon_data.csv"
 
+
 def load_csv(path: str = DEFAULT_CSV) -> Dict[str, Dict]:
     if not os.path.exists(path):
-        raise FileNotFoundError(f"CSV not found at {path}. Place your provided CSV as {path}")
+        raise FileNotFoundError(f"CSV not found at {path}. Please ensure pokemon_data.csv is present.")
+
     d = {}
-    with open(path, newline='', encoding='utf-8') as f:
+    # Use utf-8-sig to handle potential BOM from Excel saves
+    with open(path, newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
-            # Normalize name key to lower for easy lookup
+            # Handle possible name keys
             name = row.get("name") or row.get("japanese_name") or ""
             key = name.strip().lower()
+
+            # Skip empty rows
+            if not key:
+                continue
+
             try:
+                # We store the raw_row because it contains all the 'against_fire', 'against_bug' etc.
+                # which are needed for Type Effectiveness calculations in battle.py.
                 d[key] = {
                     "name": name,
                     "hp": int(row.get("hp") or 0),
@@ -31,8 +41,9 @@ def load_csv(path: str = DEFAULT_CSV) -> Dict[str, Dict]:
                     "raw_row": row
                 }
             except Exception as e:
-                print("[POKEMON] row parse error for", name, e)
+                print(f"[POKEMON] Skipping bad row '{name}': {e}")
     return d
+
 
 def get_pokemon(pokemon_db: Dict[str, Dict], name: str) -> Optional[Dict]:
     if name is None:

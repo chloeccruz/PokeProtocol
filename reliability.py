@@ -1,5 +1,4 @@
 # reliability.py
-# implements sequence numbers, ACK handling, retransmission checker
 
 import threading
 import time
@@ -45,17 +44,12 @@ class ReliabilityLayer:
             return s
 
     def send_with_reliability(self, msg_dict: Dict[str,Any], dest: Tuple[str,int]):
-        """
-        add sequence_number if needed and queue message for retransmission
-        ACK messages are expected to have message_type == "ACK" and may contain ack_number but are not queued
-        """
         if msg_dict.get("message_type") != "ACK":
             if "sequence_number" not in msg_dict:
                 msg_dict["sequence_number"] = self.next_sequence()
         payload = serialize_message(msg_dict)
         seq = int(msg_dict.get("sequence_number", 0) or 0)
 
-        # send
         try:
             self.sock.sendto(payload, dest)
             self.log("Sent seq", seq, "to", dest, "type", msg_dict.get("message_type"))
@@ -93,13 +87,11 @@ class ReliabilityLayer:
                         else:
                             timed_out.append(seq)
                             print(f"[RELIABILITY] Seq {seq} exceeded max retries; giving up.")
-            # retransmit outside lock
             for pm in to_retransmit:
                 try:
                     self.sock.sendto(pm.payload, pm.dest)
                 except Exception as e:
                     print("[RELIABILITY] retransmit failed:", e)
-            # handle timed_out (remove)
             with self.lock:
                 for seq in timed_out:
                     if seq in self.pending:
