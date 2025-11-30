@@ -20,17 +20,17 @@ This project is a fully functional Peer-to-Peer (P2P) Pokémon battle system bui
 
 ## File Structure
 
-- ```**main.py:**``` The entry point. Handles CLI user input and starts the node.
+- ```main.py:``` The entry point. Handles CLI user input and starts the node.
 
-- ```**network.py:**``` Manages the UDP socket, threading, and packet dispatching.
+- ```network.py:``` Manages the UDP socket, threading, and packet dispatching.
 
-- ```**reliability.py:**``` Handles the "Stop-and-Wait" logic, retransmission timers, and tracking pending ACKs.
+- ```reliability.py:``` Handles the "Stop-and-Wait" logic, retransmission timers, and tracking pending ACKs.
 
-- ```**battle.py:**``` Contains the ```BattleState```, turn logic, and the specific damage formulas.
+- ```battle.py:``` Contains the ```BattleState```, turn logic, and the specific damage formulas.
 
-- ```**messages.py:**``` Utilities for serializing/parsing the ```key: value``` message format.
+- ```messages.py:``` Utilities for serializing/parsing the ```key: value``` message format.
 
-- ```**pokemon.py:**``` Handles CSV parsing and stats lookup.
+- ```pokemon.py:``` Handles CSV parsing and stats lookup.
 
 ## How to Run
 
