@@ -86,11 +86,11 @@ Once connected, use these commands in the terminal:
 
 - ```/status```
 
-  - Description: Displays current HP for both players.
+  - _Description:_ Displays current HP for both players.
 
 - ```/quit```
 
-  - Description: Disconnects and closes the game.
+  - _Description:_ Disconnects and closes the game.
 
 ## Architecture & Logic
 
